@@ -6,19 +6,42 @@ export class SaveAverageUseCase {
 
   async execute(data: Data[]): Promise<void> {
     const averages = this.calculateAverages(data);
-    await this.dataRepository.saveAverage(averages);
+
+    for (const average of averages) {
+      average.createdAt = new Date();
+      await this.dataRepository.saveAverage(average);
+    }
   }
 
-  private calculateAverages(data: Data[]): Data {
+  private calculateAverages(data: Data[]): Data[] {
     if (!data || data.length === 0) {
       throw new Error('No se han proporcionado datos válidos');
     }
-    const stationId = data[0].station_id;
-    const temperature = data.reduce((sum, item) => sum + item.temperature, 0) / data.length;
-    const humidity = data.reduce((sum, item) => sum + item.humidity, 0) / data.length;
-    const radiation = data.reduce((sum, item) => sum + item.radiation, 0) / data.length;
-  
-    return { station_id: stationId, temperature: temperature, humidity: humidity, radiation: radiation };
+
+    const groupedData = data.reduce((acc, item) => {
+      if (!acc[item.station_id]) {
+        acc[item.station_id] = {
+          station_id: item.station_id,
+          temperature: 0,
+          humidity: 0,
+          radiation: 0,
+          count: 0
+        };
+      }
+      acc[item.station_id].temperature += item.temperature;
+      acc[item.station_id].humidity += item.humidity;
+      acc[item.station_id].radiation += item.radiation;
+      acc[item.station_id].count++;
+      return acc;
+    }, {} as Record<string, { station_id: string; temperature: number; humidity: number; radiation: number; count: number }>);
+
+    const averages = Object.values(groupedData).map(({ station_id, temperature, humidity, radiation, count }) => ({
+      station_id,
+      temperature: temperature / count,
+      humidity: humidity / count,
+      radiation: (radiation / count) * 1000
+    }));
+
+    return averages;
   }
-  
 }

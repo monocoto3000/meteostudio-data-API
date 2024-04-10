@@ -1,4 +1,4 @@
 export enum QueueName {
-    InitialQueue = 'payments',
-    FinalQueue = 'approved',
+    InitialQueue = 'data',
+    FinalQueue = 'averages',
 }
