@@ -6,7 +6,10 @@ import { QueueName } from '../../shared/broker/domain/entities/QueueName';
 export class ReceiveDataController {
   private channel: any;
 
-  constructor(private saveAverageUseCase: SaveAverageUseCase, private amqpLib: Amqplib) {
+  constructor(
+    private saveAverageUseCase: SaveAverageUseCase, 
+    private amqpLib: Amqplib
+  ) {
     this.initChannel();
     this.consumeFromQueue(); 
   }

@@ -1,8 +1,13 @@
 import { DataRepository } from '../../domain/repository/DataRepository';
+import { BrokerRepository } from '../../shared/broker/domain/repository/BrokerRepository';
 import { Data } from '../../domain/entities/Data';
+import { QueueRequest, QueueName } from '../../shared/broker/domain/entities';
 
 export class SaveAverageUseCase {
-  constructor(private dataRepository: DataRepository) {}
+  constructor(
+    private dataRepository: DataRepository,
+    private brokerRepository: BrokerRepository
+  ) {}
 
   async execute(data: Data[]): Promise<void> {
     const averages = this.calculateAverages(data);
@@ -10,6 +15,12 @@ export class SaveAverageUseCase {
     for (const average of averages) {
       average.createdAt = new Date();
       await this.dataRepository.saveAverage(average);
+      
+      const queueRequest: QueueRequest = {
+        queueName: QueueName.FinalQueue,
+        content: average 
+      };
+      await this.brokerRepository.sendMessageToChannel(queueRequest)
     }
   }
 

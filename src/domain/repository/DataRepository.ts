@@ -8,4 +8,5 @@ export interface DataRepository {
   getMinHumidity(stationId: string): Promise<Data | null>;
   getMaxRadiation(stationId: string): Promise<Data | null>;
   getMinRadiation(stationId: string): Promise<Data | null>;
+  getDataByID(stationId: string): Promise<Data | null>
 }

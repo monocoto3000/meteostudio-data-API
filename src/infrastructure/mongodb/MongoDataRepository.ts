@@ -85,4 +85,21 @@ export class MongoDataRepository implements DataRepository {
       .limit(1);
     return result !== null ? result.toObject() as Data : null;
   }
+
+  // Get by ID
+
+  async getDataByID(stationId: string): Promise<Data | null> {
+    try {
+      const result = await DataModel.findOne({ station_id: stationId });
+      if (result) {
+        return result.toObject() as Data;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      throw new Error('Error obteniendo el dato por ID');
+    }
+  }
+
 }

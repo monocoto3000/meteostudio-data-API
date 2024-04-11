@@ -9,4 +9,4 @@ const DataSchema = new Schema<Data & Document>({
   createdAt: { type: Date, required: true, default: Date.now }
 });
 
-export const DataModel = model<Data & Document>('Data', DataSchema);
+export const DataModel = model<Data & Document>('data', DataSchema);
