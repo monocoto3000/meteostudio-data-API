@@ -12,6 +12,8 @@ app.use('*', (req: Request, res: Response) => {
   res.status(404).send('not found');
 });
 
+
+
 app.listen(3001, () => {
   console.log('Server running on port 3001');
 });

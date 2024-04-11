@@ -43,7 +43,8 @@ export class Amqplib implements BrokerRepository {
       channel.sendToQueue(queueName, Buffer.from(JSON.stringify(content)), {
         persistent: true,
       });
-      console.log('Mensaje enviado: ' + content);
+      console.log(`Mensaje enviado a la cola ${queueName}:`)
+      console.log(content);
     } catch (err: any) {
       throw new Error(err);
     }

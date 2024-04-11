@@ -86,8 +86,6 @@ export class MongoDataRepository implements DataRepository {
     return result !== null ? result.toObject() as Data : null;
   }
 
-  // Get by ID
-
   async getDataByID(stationId: string): Promise<Data | null> {
     try {
       const result = await DataModel.findOne({ station_id: stationId });
