@@ -3,5 +3,5 @@ export interface Data {
   temperature: number;
   humidity: number;
   radiation: number;
-  createdAt?: Date;
+  createdAt?: string;
 }

@@ -13,7 +13,7 @@ export class SaveAverageUseCase {
     const averages = this.calculateAverages(data);
 
     for (const average of averages) {
-      average.createdAt = new Date();
+      average.createdAt = new Date().toLocaleString("en-US", {timeZone: "America/Mexico_City"});
       await this.dataRepository.saveAverage(average);
       
       const queueRequest: QueueRequest = {

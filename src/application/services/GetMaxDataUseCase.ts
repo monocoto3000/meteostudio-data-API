@@ -2,27 +2,44 @@ import { Data } from "../../domain/entities/Data";
 import { DataRepository } from "../../domain/repository/DataRepository";
 
 export class GetMaxDataUseCase {
-    constructor(private readonly dataRepository: DataRepository) {}
-  
-    async getMaxData(stationId: string): Promise<Data> {
-      try {
-        const maxTemperatureData = await this.dataRepository.getMaxTemperature(stationId);
-        const maxHumidityData = await this.dataRepository.getMaxHumidity(stationId);
-        const maxRadiationData = await this.dataRepository.getMaxRadiation(stationId);
-  
-        if (maxTemperatureData && maxHumidityData && maxRadiationData) {
-          return {
-            station_id: stationId,
-            temperature: maxTemperatureData.temperature,
-            humidity: maxHumidityData.humidity,
-            radiation: maxRadiationData.radiation,
-          };
-        } else {
-          throw new Error("Error obteniendo el máximo");
+  constructor(private readonly dataRepository: DataRepository) { }
+
+  async getMaxData(stationId: string, date: string): Promise<Data | null> {
+    try {
+      const useDate = new Date(date);
+      const startOfDay = new Date(useDate.getFullYear(), useDate.getMonth(), useDate.getDate(), 0, 0, 0, 0);
+      const endOfDay = new Date(useDate.getFullYear(), useDate.getMonth(), useDate.getDate(), 23, 59, 59, 999);
+
+      const allData = await this.dataRepository.getAllDataByStationId(stationId, startOfDay, endOfDay);
+
+      let maxTemperature = -Infinity;
+      let maxHumidity = -Infinity;
+      let maxRadiation = -Infinity;
+
+      allData.forEach(data => {
+        if (data.temperature > maxTemperature) {
+          maxTemperature = data.temperature;
         }
-      } catch (error) {
-        console.error("Error:", error);   
-        throw new Error("Error obteniendo el máximo");
-      }
+        if (data.humidity > maxHumidity) {
+          maxHumidity = data.humidity;
+        }
+        if (data.radiation > maxRadiation) {
+          maxRadiation = data.radiation;
+        }
+      });
+
+      const maxData: Data = {
+        station_id: stationId,
+        temperature: maxTemperature,
+        humidity: maxHumidity,
+        radiation: maxRadiation,
+        createdAt: new Date().toLocaleString("en-US", {timeZone: "America/Mexico_City"})
+      };
+
+      return maxData;
+    } catch (error) {
+      console.error("Error:", error);
+      throw new Error("Error obteniendo el máximo");
     }
   }
+}

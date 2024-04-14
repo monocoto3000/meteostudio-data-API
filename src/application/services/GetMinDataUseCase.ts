@@ -6,19 +6,13 @@ export class GetMinDataUseCase {
 
     async getMinData(stationId: string): Promise<Data> {
         try {
-            const minTemperatureData = await this.dataRepository.getMinTemperature(stationId);
-            const minHumidityData = await this.dataRepository.getMinHumidity(stationId);
-            const minRadiationData = await this.dataRepository.getMinRadiation(stationId);
-            if (minHumidityData && minRadiationData && minTemperatureData) {
-                return {
-                    station_id: stationId,
-                    temperature: minTemperatureData.temperature,
-                    humidity: minHumidityData.humidity,
-                    radiation: minRadiationData.radiation,
-                };
+            const currentDate = new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" });
+            const minData = await this.dataRepository.getMinData(stationId, currentDate);
+            if (minData) {
+                return minData;
             } else {
                 throw new Error("Error obteniendo el mínimo");
-            } 
+            }
         } catch (error) {
             console.error("Error:", error);
             throw new Error("Error obteniendo el mínimo");
