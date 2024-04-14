@@ -9,9 +9,9 @@ export class GetMaxDataUseCase {
       const useDate = new Date(date);
       const startOfDay = new Date(useDate.getFullYear(), useDate.getMonth(), useDate.getDate(), 0, 0, 0, 0);
       const endOfDay = new Date(useDate.getFullYear(), useDate.getMonth(), useDate.getDate(), 23, 59, 59, 999);
-
+      console.log(startOfDay)
+      console.log(endOfDay)
       const allData = await this.dataRepository.getAllDataByStationId(stationId, startOfDay, endOfDay);
-
       let maxTemperature = -Infinity;
       let maxHumidity = -Infinity;
       let maxRadiation = -Infinity;

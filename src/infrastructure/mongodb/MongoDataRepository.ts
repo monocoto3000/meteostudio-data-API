@@ -21,6 +21,7 @@ export class MongoDataRepository implements DataRepository {
         createdAt: { type: String, required: true }
       });
       dataSchema.index({ station_id: 1 });
+      dataSchema.index({ createdAt: 1 });
       this.collection = mongoose.model<Data & Document>('data', dataSchema, 'data');
     } catch (error) {
       console.log('Error connecting to MongoDB:', error);
@@ -91,10 +92,20 @@ export class MongoDataRepository implements DataRepository {
 
 
 
-  async getAllDataByStationId(stationId: string): Promise<Data[]> {
+  async getAllDataByStationId(stationId: string, startDate: Date, endDate: Date): Promise<Data[]> {
     try {
-      console.log(`Fetching data for station ID: ${stationId}`);
-      const results = await this.collection.find({ station_id: stationId }).exec();
+      console.log(`Fetching data for station ID ${stationId} for today`);
+  
+      const formattedStartDate = startDate.toLocaleDateString('en-US', { timeZone: 'America/Mexico_City' });
+      const formattedEndDate = endDate.toLocaleDateString('en-US', { timeZone: 'America/Mexico_City' });
+  
+      const regexDateRange = new RegExp(`^(${formattedStartDate}|${formattedEndDate})`);
+  
+      const results = await this.collection.find({ 
+        station_id: stationId, 
+        createdAt: { $regex: regexDateRange } 
+      }).exec();
+  
       console.log(`Found ${results.length} results`);
       return results.map((result) => result.toObject() as Data);
     } catch (error) {
@@ -102,4 +113,8 @@ export class MongoDataRepository implements DataRepository {
       throw new Error('Error obteniendo los datos por ID');
     }
   }
+  
+  
+  
+  
 }
