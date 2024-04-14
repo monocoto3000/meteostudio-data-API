@@ -33,7 +33,7 @@ export class GetMaxDataUseCase {
         temperature: maxTemperature,
         humidity: maxHumidity,
         radiation: maxRadiation,
-        createdAt: new Date().toLocaleString("en-US", {timeZone: "America/Mexico_City"})
+        createdAt: new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" })
       };
 
       return maxData;

@@ -9,7 +9,6 @@ export class GetDataByIDUseCase {
       const useDate = new Date(date);
       const startDate = new Date(useDate.getFullYear(), useDate.getMonth(), useDate.getDate(), 0, 0, 0, 0);
       const endDate = new Date(useDate.getFullYear(), useDate.getMonth(), useDate.getDate(), 23, 59, 59, 999);
-
       const data = await this.dataRepository.getAllDataByStationId(stationId, startDate, endDate);
       return data;
     } catch (error) {
