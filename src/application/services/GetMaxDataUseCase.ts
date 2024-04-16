@@ -4,13 +4,12 @@ import { DataRepository } from "../../domain/repository/DataRepository";
 export class GetMaxDataUseCase {
   constructor(private readonly dataRepository: DataRepository) { }
 
-  async getMaxData(stationId: string, date: string): Promise<Data | null> {
+  async getMaxData(stationId: string, date: Date): Promise<Data | null> {
     try {
-      const useDate = new Date(date);
-      const startOfDay = new Date(useDate.getFullYear(), useDate.getMonth(), useDate.getDate(), 0, 0, 0, 0);
-      const endOfDay = new Date(useDate.getFullYear(), useDate.getMonth(), useDate.getDate(), 23, 59, 59, 999);
-      console.log(startOfDay)
-      console.log(endOfDay)
+      const startOfDay = new Date(date);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(date);
+      endOfDay.setHours(23, 59, 59, 999);
       const allData = await this.dataRepository.getAllDataByStationId(stationId, startOfDay, endOfDay);
       let maxTemperature = -Infinity;
       let maxHumidity = -Infinity;
@@ -33,7 +32,7 @@ export class GetMaxDataUseCase {
         temperature: maxTemperature,
         humidity: maxHumidity,
         radiation: maxRadiation,
-        createdAt: new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" })
+        createdAt: date
       };
 
       return maxData;

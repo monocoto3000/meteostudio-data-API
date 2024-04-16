@@ -4,11 +4,12 @@ import { DataRepository } from "../../domain/repository/DataRepository";
 export class GetMinDataUseCase {
     constructor(private readonly dataRepository: DataRepository) { }
 
-    async getMinData(stationId: string, date: string): Promise<Data | null> {
+    async getMinData(stationId: string, date: Date): Promise<Data | null> {
         try {
-            const useDate = new Date(date);
-            const startOfDay = new Date(useDate.getFullYear(), useDate.getMonth(), useDate.getDate(), 0, 0, 0, 0);
-            const endOfDay = new Date(useDate.getFullYear(), useDate.getMonth(), useDate.getDate(), 23, 59, 59, 999);
+            const startOfDay = new Date(date);
+            startOfDay.setHours(0, 0, 0, 0);
+            const endOfDay = new Date(date);
+            endOfDay.setHours(23, 59, 59, 999);
             const allData = await this.dataRepository.getAllDataByStationId(stationId, startOfDay, endOfDay);
             if (allData.length === 0) {
                 return null;
@@ -34,7 +35,7 @@ export class GetMinDataUseCase {
                 temperature: minTemperature,
                 humidity: minHumidity,
                 radiation: minRadiation,
-                createdAt: new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" })
+                createdAt: new Date()
             };
 
             return minData;

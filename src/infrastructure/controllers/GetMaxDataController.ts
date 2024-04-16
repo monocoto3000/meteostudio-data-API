@@ -6,7 +6,7 @@ export class GetMaxDataController {
   async getMaxDataByStationId(req: Request, res: Response) {
     const { stationId } = req.body;
     try {
-      const maxData = await this.getMaxDataUseCase.getMaxData(stationId, new Date().toLocaleString("en-US", {timeZone: "America/Mexico_City"}));
+      const maxData = await this.getMaxDataUseCase.getMaxData(stationId, new Date());
       res.status(200).json(maxData);
     } catch (error: any) {
       res.status(500).json({ error: error.message });

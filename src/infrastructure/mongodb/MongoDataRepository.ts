@@ -18,7 +18,7 @@ export class MongoDataRepository implements DataRepository {
         temperature: { type: Number, required: true },
         humidity: { type: Number, required: true },
         radiation: { type: Number, required: true },
-        createdAt: { type: String, required: true }
+        createdAt: { type: Date, required: true }
       });
       dataSchema.index({ station_id: 1 });
       dataSchema.index({ createdAt: 1 });
@@ -33,19 +33,27 @@ export class MongoDataRepository implements DataRepository {
     await this.collection.create(data);
   }
 
-  async getMaxData(stationId: string, date: string): Promise<Data | null> {
+  async getMaxData(stationId: string, date: Date): Promise<Data | null> {
     try {
-      const useDate = new Date(date);
-      const startOfDay = new Date(useDate.getFullYear(), useDate.getMonth(), useDate.getDate(), 0, 0, 0, 0);
-      const endOfDay = new Date(useDate.getFullYear(), useDate.getMonth(), useDate.getDate(), 23, 59, 59, 999);
-      const results = await this.collection.find({ station_id: stationId, createdAt: { $gte: startOfDay, $lte: endOfDay } }).exec();
+      const startOfDay = new Date(date);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(date);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      const results = await this.collection.find({
+        station_id: stationId,
+        createdAt: { $gte: startOfDay, $lte: endOfDay }
+      }).exec();
+
       if (results.length === 0) {
         return null;
       }
+
       let maxTemperature = Number.MIN_SAFE_INTEGER;
       let maxHumidity = Number.MIN_SAFE_INTEGER;
       let maxRadiation = Number.MIN_SAFE_INTEGER;
       let maxData: Data | null = null;
+
       results.forEach((result) => {
         const { temperature, humidity, radiation } = result;
         if (temperature > maxTemperature) {
@@ -64,7 +72,7 @@ export class MongoDataRepository implements DataRepository {
         temperature: maxTemperature,
         humidity: maxHumidity,
         radiation: maxRadiation,
-        createdAt: new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" })
+        createdAt: new Date()
       };
 
       return maxData;
@@ -75,16 +83,22 @@ export class MongoDataRepository implements DataRepository {
   }
 
 
-  async getMinData(stationId: string, date: string): Promise<Data | null> {
+  async getMinData(stationId: string, date: Date): Promise<Data | null> {
     try {
-      const useDate = new Date(date);
-      const startOfDay = new Date(useDate.getFullYear(), useDate.getMonth(), useDate.getDate(), 0, 0, 0, 0);
-      const endOfDay = new Date(useDate.getFullYear(), useDate.getMonth(), useDate.getDate(), 23, 59, 59, 999);
-      const results = await this.collection.find({ station_id: stationId, createdAt: { $gte: startOfDay, $lte: endOfDay } }).exec();
+      const startOfDay = new Date(date);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(date);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      const results = await this.collection.find({
+        station_id: stationId,
+        createdAt: { $gte: startOfDay, $lte: endOfDay }
+      }).exec();
 
       if (results.length === 0) {
         return null;
       }
+
       let minTemperature = Infinity;
       let minHumidity = Infinity;
       let minRadiation = Infinity;
@@ -107,7 +121,7 @@ export class MongoDataRepository implements DataRepository {
         temperature: minTemperature,
         humidity: minHumidity,
         radiation: minRadiation,
-        createdAt: new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" })
+        createdAt: new Date()
       };
 
       return minData;
@@ -117,20 +131,17 @@ export class MongoDataRepository implements DataRepository {
     }
   }
 
+
   async getAllDataByStationId(stationId: string, startDate: Date, endDate: Date): Promise<Data[]> {
     try {
       console.log(`Fetching data for station ID ${stationId} for today`);
-
-      const formattedStartDate = startDate.toLocaleDateString('en-US', { timeZone: 'America/Mexico_City' });
-      const formattedEndDate = endDate.toLocaleDateString('en-US', { timeZone: 'America/Mexico_City' });
-
-      const regexDateRange = new RegExp(`^(${formattedStartDate}|${formattedEndDate})`);
-
       const results = await this.collection.find({
         station_id: stationId,
-        createdAt: { $regex: regexDateRange }
+        createdAt: {
+          $gte: startDate,
+          $lte: endDate
+        }
       }).exec();
-
       console.log(`Found ${results.length} results`);
       return results.map((result) => result.toObject() as Data);
     } catch (error) {
