@@ -1,6 +1,12 @@
 import { MongoDataRepository } from './mongodb/MongoDataRepository';
 import { initAmqpLib } from './brokers/amqplib/Amqplib';
 
+//
+const USERNAME = "meteostudio"
+const PASSWORD = encodeURIComponent("CMdui89!gdDDD145x?")
+const HOSTNAME = "100.25.187.231"
+const PORT = 5672
+
 // Use Cases
 import { SaveAverageUseCase } from '../application/services/SaveAverageUseCase';
 import { GetMaxDataUseCase } from '../application/services/GetMaxDataUseCase';
@@ -16,7 +22,7 @@ import { GetDataByIDController } from './controllers/GetDataByIDController';
 import { GetDataByDateController } from './controllers/GetDataByDateController';
 
 const mongoDataRepository = new MongoDataRepository('mongodb://localhost:27017/meteostudio');
-const amqpLib = initAmqpLib('amqp://52.6.228.180/');
+const amqpLib = initAmqpLib(`amqp://${USERNAME}:${PASSWORD}@${HOSTNAME}:${PORT}`);
 
 const saveAverageUseCase = new SaveAverageUseCase(mongoDataRepository, amqpLib);
 const getMaxDataUseCase = new GetMaxDataUseCase(mongoDataRepository)

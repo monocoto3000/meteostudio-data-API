@@ -15,12 +15,6 @@ export class SaveAverageUseCase {
     for (const average of averages) {
       average.createdAt = new Date();
       await this.dataRepository.saveAverage(average);
-      
-      const queueRequest: QueueRequest = {
-        queueName: QueueName.FinalQueue,
-        content: average 
-      };
-      await this.brokerRepository.sendMessageToChannel(queueRequest)
     }
   }
 
