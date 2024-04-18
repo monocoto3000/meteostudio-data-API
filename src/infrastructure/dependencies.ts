@@ -21,7 +21,7 @@ import { GetMinDataController } from './controllers/GetMinDataController';
 import { GetDataByIDController } from './controllers/GetDataByIDController';
 import { GetDataByDateController } from './controllers/GetDataByDateController';
 
-const mongoDataRepository = new MongoDataRepository('mongodb://localhost:27017/meteostudio');
+const mongoDataRepository = new MongoDataRepository('mongodb://50.17.41.245:27017');
 const amqpLib = initAmqpLib(`amqp://${USERNAME}:${PASSWORD}@${HOSTNAME}:${PORT}`);
 
 const saveAverageUseCase = new SaveAverageUseCase(mongoDataRepository, amqpLib);
