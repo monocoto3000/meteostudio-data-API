@@ -1,3 +1,3 @@
 export enum QueueName {
-    InitialQueue = 'Meteorological'
+    InitialQueue = 'Averages'
 }
