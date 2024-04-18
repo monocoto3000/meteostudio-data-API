@@ -39,7 +39,7 @@ export class Amqplib implements BrokerRepository {
     const { queueName, content } = req;
     try {
       const channel = await this.createChannel();
-      await channel.assertQueue(queueName);
+      await channel.assertQueue(queueName, {durable:true, arguments:{"x-queue-type":"quorum"}});
       channel.sendToQueue(queueName, Buffer.from(JSON.stringify(content)), {
         persistent: true,
       });
@@ -53,7 +53,7 @@ export class Amqplib implements BrokerRepository {
   async consumeQueue(queueName: string): Promise<QueueResponse | null> {
     try {
       const channel = await this.createChannel();
-      await channel.assertQueue(queueName);
+      await channel.assertQueue(queueName, {durable:true, arguments:{"x-queue-type":"quorum"}});
       const message = await new Promise<QueueResponse | null>((resolve, reject) => {
         channel.get(queueName, { noAck: false }, (err, msg) => {
           if (err) {

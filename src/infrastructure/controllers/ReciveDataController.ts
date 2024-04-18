@@ -16,7 +16,7 @@ export class ReceiveDataController {
 
   private async initChannel() {
     this.channel = await this.amqpLib.createChannel();
-    await this.channel.assertQueue(QueueName.InitialQueue);
+    await this.channel.assertQueue(QueueName.InitialQueue, {durable:true, arguments:{"x-queue-type":"quorum"}});
   }
 
   async handle(request: Request, response: Response): Promise<Response> {
